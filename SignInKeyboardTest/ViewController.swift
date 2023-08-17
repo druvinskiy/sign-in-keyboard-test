@@ -59,12 +59,11 @@ class ViewController: UIViewController {
         let segmentedControl = UISegmentedControl(items: ["One", "Two"])
         segmentedControl.translatesAutoresizingMaskIntoConstraints = false
         segmentedControl.setContentCompressionResistancePriority(.required, for: .vertical)
-        segmentedControl.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        segmentedControl.setContentHuggingPriority(.required, for: .vertical)
         return segmentedControl
     }()
     
-    lazy var buttonBottomConstraint = button.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor, constant: -20)
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -78,12 +77,10 @@ class ViewController: UIViewController {
     }
     
     @objc func keyboardWillAppear() {
-        self.buttonBottomConstraint.isActive = true
         self.view.layoutIfNeeded()
     }
     
     @objc func keyboardWillDisappear() {
-        self.buttonBottomConstraint.isActive = false
         self.view.layoutIfNeeded()
     }
     
@@ -120,6 +117,9 @@ class ViewController: UIViewController {
             button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             button.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: 20),
             button.heightAnchor.constraint(equalToConstant: 44),
+
+            button.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor, constant: -20),
+            segmentedControl.heightAnchor.constraint(equalToConstant: 35)
         ])
     }
     
