@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UITextFieldDelegate {
     
     let usernameTextField: UITextField = {
         let textField = UITextField()
@@ -26,6 +26,7 @@ class ViewController: UIViewController {
         textField.setLeftPaddingPoints(10)
         textField.tintColor = .label
         textField.backgroundColor = .gray
+//        textField.isSecureTextEntry = true // If I comment this out, the jerking stops
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
         textField.setContentHuggingPriority(.defaultHigh, for: .vertical)
@@ -63,25 +64,16 @@ class ViewController: UIViewController {
         return segmentedControl
     }()
     
+    var textFields: [UITextField] {
+        return [usernameTextField, passwordTextField]
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         configureUI()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillDisappear), name: UIResponder.keyboardWillHideNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillAppear), name: UIResponder.keyboardWillShowNotification, object: nil)
-    }
-    
-    @objc func keyboardWillAppear() {
-        self.view.layoutIfNeeded()
-    }
-    
-    @objc func keyboardWillDisappear() {
-        self.view.layoutIfNeeded()
+        usernameTextField.delegate = self
+        passwordTextField.delegate = self
     }
     
     func configureUI() {
@@ -118,13 +110,21 @@ class ViewController: UIViewController {
             button.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: 20),
             button.heightAnchor.constraint(equalToConstant: 44),
 
-            button.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor, constant: -20),
-            segmentedControl.heightAnchor.constraint(equalToConstant: 35)
+            button.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor, constant: -20)
         ])
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.view.endEditing(true)
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if let selectedTextFieldIndex = textFields.firstIndex(of: textField), selectedTextFieldIndex < textFields.count - 1 {
+            textFields[selectedTextFieldIndex + 1].becomeFirstResponder()
+        } else {
+            textField.resignFirstResponder() // last textfield, dismiss keyboard directly
+        }
+        return true
     }
 }
 
